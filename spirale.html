@@ -1,0 +1,120 @@
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Simulation itérative montrant si le péage converge vers un équilibre ou diverge en spirale quand les usagers fuient les hausses de prix.</h2>
+
+<div style="padding: 0.5rem 0;">
+
+<div style="display:flex; align-items:center; gap:12px; margin:0 0 0.75rem;">
+<label style="font-size:14px; color:var(--text-secondary); min-width:210px;">Coûts annuels à couvrir (M$/an)</label>
+<input type="range" min="100" max="900" step="10" value="500" id="cout" style="flex:1;" />
+<span style="font-size:14px; font-weight:500; min-width:56px; text-align:right;" id="cout-out">500</span>
+</div>
+
+<div style="display:flex; align-items:center; gap:12px; margin:0 0 0.75rem;">
+<label style="font-size:14px; color:var(--text-secondary); min-width:210px;">Trafic projeté à péage nul (véh./jour)</label>
+<input type="range" min="10000" max="90000" step="1000" value="50000" id="d0" style="flex:1;" />
+<span style="font-size:14px; font-weight:500; min-width:56px; text-align:right;" id="d0-out">50 000</span>
+</div>
+
+<div style="display:flex; align-items:center; gap:12px; margin:0 0 1rem;">
+<label style="font-size:14px; color:var(--text-secondary); min-width:210px;">Sensibilité (% d'usagers perdus par $)</label>
+<input type="range" min="0" max="4" step="0.1" value="1.5" id="sens" style="flex:1;" />
+<span style="font-size:14px; font-weight:500; min-width:56px; text-align:right;" id="sens-out">1,5</span>
+</div>
+
+<div style="margin:0 0 1rem; position:relative; height:220px;">
+<canvas id="chart"></canvas>
+</div>
+
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin:0 0 1rem;">
+<div style="background:var(--surface-1); border-radius:var(--radius); padding:1rem;">
+<p style="font-size:13px; color:var(--text-muted); margin:0 0 4px;">Péage naïf (itération 0)</p>
+<p style="font-size:24px; font-weight:500; margin:0;" id="base-out">—</p>
+</div>
+<div style="background:var(--surface-1); border-radius:var(--radius); padding:1rem;">
+<p style="font-size:13px; color:var(--text-muted); margin:0 0 4px;">Péage final</p>
+<p style="font-size:24px; font-weight:500; margin:0;" id="eq-out">—</p>
+</div>
+<div style="background:var(--surface-1); border-radius:var(--radius); padding:1rem;">
+<p style="font-size:13px; color:var(--text-muted); margin:0 0 4px;">Achalandage final</p>
+<p style="font-size:24px; font-weight:500; margin:0;" id="dfin-out">—</p>
+</div>
+</div>
+
+<div id="verdict" style="border-left:3px solid var(--border-danger); background:var(--bg-danger); padding:0.75rem 1rem;">
+<p style="font-size:14px; margin:0; color:var(--text-danger);" id="verdict-txt">—</p>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+let chart = null;
+
+function simulate() {
+  const A = parseFloat($('cout').value) * 1e6;
+  const D0 = parseInt($('d0').value);
+  const s = parseFloat($('sens').value) / 100;
+  $('cout-out').textContent = $('cout').value;
+  $('d0-out').textContent = D0.toLocaleString('fr-CA');
+  $('sens-out').textContent = parseFloat($('sens').value).toLocaleString('fr-CA', {minimumFractionDigits: 1});
+
+  const tolls = [];
+  let D = D0;
+  let p = A / (365 * D);
+  let dead = false;
+  for (let i = 0; i <= 14; i++) {
+    tolls.push(p);
+    D = D0 * (1 - s * p);
+    if (D <= 500 || p > 300) { dead = true; break; }
+    p = A / (365 * D);
+  }
+
+  const base = A / (365 * D0);
+  const converged = !dead && Math.abs(tolls[tolls.length - 1] - tolls[tolls.length - 2]) < 0.05;
+  const fmt = v => v.toLocaleString('fr-CA', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' $';
+
+  $('base-out').textContent = fmt(base);
+  $('eq-out').textContent = dead ? '∞' : fmt(tolls[tolls.length - 1]);
+  $('dfin-out').textContent = dead ? '≈ 0' : Math.round(D).toLocaleString('fr-CA') + ' véh./j';
+
+  const box = $('verdict'), txt = $('verdict-txt');
+  if (dead || !converged) {
+    box.style.borderLeftColor = 'var(--border-danger)';
+    box.style.background = 'var(--bg-danger)';
+    txt.style.color = 'var(--text-danger)';
+    txt.textContent = 'Spirale : aucun péage ne couvre les coûts. Chaque hausse fait fuir plus de revenus qu\u2019elle n\u2019en rapporte. Le projet exige une subvention permanente ou fait faillite.';
+  } else {
+    const perte = Math.round((1 - D / D0) * 100);
+    box.style.borderLeftColor = 'var(--border-success)';
+    box.style.background = 'var(--bg-success)';
+    txt.style.color = 'var(--text-success)';
+    txt.textContent = 'Équilibre atteint : péage de ' + fmt(tolls[tolls.length - 1]) + ' (vs ' + fmt(base) + ' projeté), avec ' + perte + ' % des usagers perdus en chemin. Viable, mais plus cher et moins achalandé que promis.';
+  }
+
+  const labels = tolls.map((_, i) => i);
+  const data = tolls.map(t => Math.min(t, 120));
+  if (chart) {
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = data;
+    chart.update();
+  } else {
+    const style = getComputedStyle(document.documentElement);
+    const txtCol = style.getPropertyValue('--text-secondary').trim() || '#888';
+    chart = new Chart($('chart'), {
+      type: 'line',
+      data: { labels: labels, datasets: [{ label: 'Péage requis ($)', data: data, borderColor: '#D85A30', backgroundColor: 'transparent', pointBackgroundColor: '#D85A30', tension: 0.2 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.parsed.y.toFixed(2) + ' $' } } },
+        scales: {
+          x: { title: { display: true, text: 'Itération (recalcul du péage)', color: txtCol, font: { size: 12 } }, ticks: { color: txtCol }, grid: { display: false } },
+          y: { beginAtZero: true, title: { display: true, text: 'Péage ($/passage)', color: txtCol, font: { size: 12 } }, ticks: { color: txtCol, callback: v => v + ' $' }, grid: { color: 'rgba(128,128,128,0.15)' } }
+        }
+      }
+    });
+  }
+}
+
+['cout', 'd0', 'sens'].forEach(id => $(id).addEventListener('input', simulate));
+simulate();
+</script>
