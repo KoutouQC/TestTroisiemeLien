@@ -1,0 +1,175 @@
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Calculateur interactif du péage requis pour le troisième lien à l'est et du bénéfice net pour un navetteur selon le temps sauvé et la distance évitée.</h2>
+
+<div style="padding: 0.5rem 0;">
+<p style="font-size:13px; color:var(--text-muted); margin:0 0 0.75rem;">1. Péage requis pour rentabiliser le pont</p>
+
+<div style="display:flex; align-items:center; gap:12px; margin:0 0 0.75rem;">
+<label style="font-size:14px; color:var(--text-secondary); min-width:170px;">Coût du projet (G$)</label>
+<input type="range" min="5" max="30" step="0.5" value="15" id="cout" style="flex:1;" />
+<span style="font-size:14px; font-weight:500; min-width:52px; text-align:right;" id="cout-out">15</span>
+</div>
+
+<div style="display:flex; align-items:center; gap:12px; margin:0 0 0.75rem;">
+<label style="font-size:14px; color:var(--text-secondary); min-width:170px;">Taux d'intérêt réel (%)</label>
+<input type="range" min="0" max="8" step="0.25" value="3.5" id="taux" style="flex:1;" />
+<span style="font-size:14px; font-weight:500; min-width:52px; text-align:right;" id="taux-out">3.5</span>
+</div>
+
+<div style="display:flex; align-items:center; gap:12px; margin:0 0 0.75rem;">
+<label style="font-size:14px; color:var(--text-secondary); min-width:170px;">Durée de vie (ans)</label>
+<input type="range" min="30" max="100" step="5" value="100" id="duree" style="flex:1;" />
+<span style="font-size:14px; font-weight:500; min-width:52px; text-align:right;" id="duree-out">100</span>
+</div>
+
+<div style="display:flex; align-items:center; gap:12px; margin:0 0 0.75rem;">
+<label style="font-size:14px; color:var(--text-secondary); min-width:170px;">Entretien (M$/an)</label>
+<input type="range" min="0" max="400" step="10" value="150" id="entretien" style="flex:1;" />
+<span style="font-size:14px; font-weight:500; min-width:52px; text-align:right;" id="entretien-out">150</span>
+</div>
+
+<div style="display:flex; align-items:center; gap:12px; margin:0 0 1rem;">
+<label style="font-size:14px; color:var(--text-secondary); min-width:170px;">Achalandage (véh./jour)</label>
+<input type="range" min="5000" max="100000" step="1000" value="50000" id="acha" style="flex:1;" />
+<span style="font-size:14px; font-weight:500; min-width:52px; text-align:right;" id="acha-out">50 000</span>
+</div>
+
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin:0 0 1.5rem;">
+<div style="background:var(--surface-1); border-radius:var(--radius); padding:1rem;">
+<p style="font-size:13px; color:var(--text-muted); margin:0 0 4px;">Coût annuel total</p>
+<p style="font-size:24px; font-weight:500; margin:0;" id="annuel-out">684 M$</p>
+</div>
+<div style="background:var(--surface-1); border-radius:var(--radius); padding:1rem;">
+<p style="font-size:13px; color:var(--text-muted); margin:0 0 4px;">Péage requis / passage</p>
+<p style="font-size:24px; font-weight:500; margin:0;" id="peage-out">37,50 $</p>
+</div>
+<div style="background:var(--surface-1); border-radius:var(--radius); padding:1rem;">
+<p style="font-size:13px; color:var(--text-muted); margin:0 0 4px;">Version Reddit (0 % intérêt)</p>
+<p style="font-size:24px; font-weight:500; margin:0;" id="reddit-out">8,22 $</p>
+</div>
+</div>
+
+<p style="font-size:13px; color:var(--text-muted); margin:0 0 0.75rem;">2. Ça vaut-tu la peine pour un navetteur?</p>
+
+<div style="display:flex; gap:8px; flex-wrap:wrap; margin:0 0 1rem;">
+<button id="p1" style="font-size:13px;">Lauzon → Beauport</button>
+<button id="p2" style="font-size:13px;">Lévis centre → Sainte-Foy</button>
+<button id="p3" style="font-size:13px;">Lauzon → centre-ville</button>
+</div>
+
+<div style="display:flex; align-items:center; gap:12px; margin:0 0 0.75rem;">
+<label style="font-size:14px; color:var(--text-secondary); min-width:170px;">Minutes sauvées / passage</label>
+<input type="range" min="-40" max="45" step="1" value="35" id="mins" style="flex:1;" />
+<span style="font-size:14px; font-weight:500; min-width:52px; text-align:right;" id="mins-out">35</span>
+</div>
+
+<div style="display:flex; align-items:center; gap:12px; margin:0 0 0.75rem;">
+<label style="font-size:14px; color:var(--text-secondary); min-width:170px;">Km évités / passage</label>
+<input type="range" min="-40" max="40" step="1" value="30" id="km" style="flex:1;" />
+<span style="font-size:14px; font-weight:500; min-width:52px; text-align:right;" id="km-out">30</span>
+</div>
+
+<div style="display:flex; align-items:center; gap:12px; margin:0 0 0.75rem;">
+<label style="font-size:14px; color:var(--text-secondary); min-width:170px;">Valeur du temps ($/h)</label>
+<input type="range" min="10" max="60" step="1" value="25" id="vdt" style="flex:1;" />
+<span style="font-size:14px; font-weight:500; min-width:52px; text-align:right;" id="vdt-out">25</span>
+</div>
+
+<div style="display:flex; align-items:center; gap:12px; margin:0 0 0.75rem;">
+<label style="font-size:14px; color:var(--text-secondary); min-width:170px;">Coût véhicule ($/km)</label>
+<input type="range" min="0.15" max="0.70" step="0.05" value="0.25" id="ckm" style="flex:1;" />
+<span style="font-size:14px; font-weight:500; min-width:52px; text-align:right;" id="ckm-out">0,25</span>
+</div>
+
+<div style="display:flex; align-items:center; gap:12px; margin:0 0 1rem;">
+<label style="font-size:14px; color:var(--text-secondary); min-width:170px;">Passages / année</label>
+<input type="range" min="50" max="700" step="10" value="500" id="pass" style="flex:1;" />
+<span style="font-size:14px; font-weight:500; min-width:52px; text-align:right;" id="pass-out">500</span>
+</div>
+
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin:0 0 1rem;">
+<div style="background:var(--surface-1); border-radius:var(--radius); padding:1rem;">
+<p style="font-size:13px; color:var(--text-muted); margin:0 0 4px;">Valeur temps + km / passage</p>
+<p style="font-size:24px; font-weight:500; margin:0;" id="benef-out">22,08 $</p>
+</div>
+<div style="background:var(--surface-1); border-radius:var(--radius); padding:1rem;">
+<p style="font-size:13px; color:var(--text-muted); margin:0 0 4px;">Net après péage / passage</p>
+<p style="font-size:24px; font-weight:500; margin:0;" id="net-out">−15,42 $</p>
+</div>
+<div style="background:var(--surface-1); border-radius:var(--radius); padding:1rem;">
+<p style="font-size:13px; color:var(--text-muted); margin:0 0 4px;">Impact annuel</p>
+<p style="font-size:24px; font-weight:500; margin:0;" id="an-out">−7 710 $</p>
+</div>
+</div>
+
+<div id="verdict" style="border-left:3px solid var(--border-danger); background:var(--bg-danger); padding:0.75rem 1rem; margin:0 0 0.5rem;">
+<p style="font-size:14px; margin:0; color:var(--text-danger);" id="verdict-txt">Même pour ce trajet, le péage dépasse le gain : ce navetteur retourne aux ponts gratuits.</p>
+</div>
+
+<button onclick="sendPrompt('Explique-moi la spirale du péage : que se passe-t-il si le péage fait baisser l\'achalandage sous les projections?')" style="font-size:13px; margin-top:0.5rem;">Et la spirale du péage? ↗</button>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt$ = v => (v < 0 ? '−' : '') + Math.abs(v).toLocaleString('fr-CA', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' $';
+const fmtInt$ = v => (v < 0 ? '−' : '') + Math.round(Math.abs(v)).toLocaleString('fr-CA') + ' $';
+let peage = 0;
+
+function calcA() {
+  const C = parseFloat($('cout').value) * 1e9;
+  const r = parseFloat($('taux').value) / 100;
+  const n = parseInt($('duree').value);
+  const E = parseFloat($('entretien').value) * 1e6;
+  const A = parseInt($('acha').value);
+  $('cout-out').textContent = $('cout').value;
+  $('taux-out').textContent = $('taux').value;
+  $('duree-out').textContent = n;
+  $('entretien-out').textContent = $('entretien').value;
+  $('acha-out').textContent = A.toLocaleString('fr-CA');
+  const annuite = r === 0 ? C / n : C * r / (1 - Math.pow(1 + r, -n));
+  const total = annuite + E;
+  const passages = A * 365;
+  peage = total / passages;
+  $('annuel-out').textContent = Math.round(total / 1e6).toLocaleString('fr-CA') + ' M$';
+  $('peage-out').textContent = fmt$(peage);
+  $('reddit-out').textContent = fmt$(C / n / passages);
+  calcB();
+}
+
+function calcB() {
+  const m = parseInt($('mins').value);
+  const k = parseInt($('km').value);
+  const v = parseFloat($('vdt').value);
+  const c = parseFloat($('ckm').value);
+  const p = parseInt($('pass').value);
+  $('mins-out').textContent = m;
+  $('km-out').textContent = k;
+  $('vdt-out').textContent = v;
+  $('ckm-out').textContent = c.toLocaleString('fr-CA', {minimumFractionDigits: 2});
+  $('pass-out').textContent = p;
+  const benef = m / 60 * v + k * c;
+  const net = benef - peage;
+  const annuel = net * p;
+  $('benef-out').textContent = fmt$(benef);
+  $('net-out').textContent = fmt$(net);
+  $('an-out').textContent = fmtInt$(annuel);
+  const box = $('verdict'), txt = $('verdict-txt');
+  if (net > 0) {
+    box.style.borderLeftColor = 'var(--border-success)';
+    box.style.background = 'var(--bg-success)';
+    txt.style.color = 'var(--text-success)';
+    txt.textContent = 'Pour ce profil, le pont à péage vaut la peine : gain net de ' + fmtInt$(annuel) + ' par année en temps et en distance.';
+  } else {
+    box.style.borderLeftColor = 'var(--border-danger)';
+    box.style.background = 'var(--bg-danger)';
+    txt.style.color = 'var(--text-danger)';
+    txt.textContent = 'Pour ce profil, le péage dépasse le gain (' + fmtInt$(annuel) + ' par année) : ce navetteur retourne aux ponts gratuits.';
+  }
+}
+
+['cout','taux','duree','entretien','acha'].forEach(id => $(id).addEventListener('input', calcA));
+['mins','km','vdt','ckm','pass'].forEach(id => $(id).addEventListener('input', calcB));
+$('p1').addEventListener('click', () => { $('mins').value = 35; $('km').value = 30; calcB(); });
+$('p2').addEventListener('click', () => { $('mins').value = -20; $('km').value = -30; calcB(); });
+$('p3').addEventListener('click', () => { $('mins').value = 10; $('km').value = 5; calcB(); });
+calcA();
+</script>
